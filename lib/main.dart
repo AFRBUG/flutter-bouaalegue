@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
@@ -21,9 +23,9 @@ runApp(
 }
 
 class _DashboardState extends State<Dashboard> {
-  Timer? timer ;
-   var response ;
-    var  _future;
+    var _future ;
+    var data ;
+      List dataList =[];
 
 
   @override
@@ -34,8 +36,19 @@ class _DashboardState extends State<Dashboard> {
   setUpTimedFetch() {
     Timer.periodic(Duration(milliseconds: 5000), (timer) {
       setState(() {
-        _future =  fetchData();
-        print(_future.hashCode) ;
+
+        _future =  fetchData().then((value) => data=value);
+
+        if(data !=null){
+          dataList=[] ; 
+          Map<String, dynamic> jsonData =
+          json.decode(data.body) as Map<String, dynamic>;
+          dataList.add(jsonData['Sensor \\#1 Humidty(%)']['value']) ;
+          dataList.add(jsonData['Sensor \\#1 Temperature(C)']['value']);
+          dataList.add(jsonData['Sensor \\#2 Humidty(%)']['value']) ;
+          dataList.add(jsonData['Sensor \\#2 Temperature(C)']['value']);
+
+        }
       });
     });
   }
@@ -47,22 +60,23 @@ class _DashboardState extends State<Dashboard> {
      Size size = MediaQuery.of(context).size;
      final height = MediaQuery.of(context).size.height;
      final width = MediaQuery.of(context).size.width;
-     var data ;
+
      return Scaffold(
 
       backgroundColor: Colors.white,
 
       body:   FutureBuilder(
           future:_future  ,
-          builder:  (context,medications  ) {
 
+          builder:  (context,snapshot  ) {
+            print(dataList) ;
             return _future.hashCode!=null ?
             Stack(
                 children:[ Column(
                   children: [
 
                     Text(
-                      "$data",
+                      "${snapshot.data}",
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20.0,
