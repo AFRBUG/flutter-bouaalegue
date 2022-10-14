@@ -34,13 +34,11 @@ class _DashboardState extends State<Dashboard> {
     setUpTimedFetch();
   }
   setUpTimedFetch() {
-    Timer.periodic(Duration(milliseconds: 5000), (timer) {
+    Timer.periodic( const Duration(milliseconds: 5000), (timer) {
       setState(() {
-
         _future =  fetchData().then((value) => data=value);
-
         if(data !=null){
-          dataList=[] ; 
+          dataList=[] ;
           Map<String, dynamic> jsonData =
           json.decode(data.body) as Map<String, dynamic>;
           dataList.add(jsonData['Sensor \\#1 Humidty(%)']['value']) ;
@@ -53,44 +51,34 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
+
   @override
-
   Widget build(BuildContext context){
-
      Size size = MediaQuery.of(context).size;
      final height = MediaQuery.of(context).size.height;
      final width = MediaQuery.of(context).size.width;
-
      return Scaffold(
-
       backgroundColor: Colors.white,
-
       body:   FutureBuilder(
           future:_future  ,
-
           builder:  (context,snapshot  ) {
-            print(dataList) ;
-            return _future.hashCode!=null ?
+            return dataList.isNotEmpty?
             Stack(
                 children:[ Column(
                   children: [
-
                     Text(
-                      "${snapshot.data}",
+                      "${dataList[0]}",
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold),
                       textAlign: TextAlign.start,
                     ),
-
+                ]
+            ) ,
                 ]
             )
-                ]
-            )
-                :const Center(
-            child: CircularProgressIndicator(),
-            );
+                :const Center(child: CircularProgressIndicator(),);
           }
       )
         );
